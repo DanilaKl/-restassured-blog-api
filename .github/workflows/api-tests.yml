@@ -1,0 +1,39 @@
+name: API tests
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      test_groups:
+        description: 'JUnit tags to run: smoke, regression, e2e, or empty for all tests'
+        required: false
+        default: ''
+
+jobs:
+  api-tests:
+    runs-on: self-hosted
+    timeout-minutes: 10
+
+    env:
+      BASE_URL: http://localhost:3000
+      TEST_GROUPS: ${{ inputs.test_groups }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Run all tests
+        if: ${{ env.TEST_GROUPS == '' }}
+        run: mvn clean test -Dbase.url="${{ env.BASE_URL }}" -DtrimStackTrace=false
+
+      - name: Run tagged tests
+        if: ${{ env.TEST_GROUPS != '' }}
+        run: mvn clean test -P"${{ env.TEST_GROUPS }}" -Dbase.url="${{ env.BASE_URL }}" -DtrimStackTrace=false
