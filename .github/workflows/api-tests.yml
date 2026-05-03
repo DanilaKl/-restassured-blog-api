@@ -1,0 +1,50 @@
+name: API tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      test_groups:
+        description: 'JUnit tags to run'
+        type: choice
+        options:
+          - all
+          - smoke
+          - regression
+          - e2e
+        required: false
+        default: all
+
+jobs:
+  api-tests:
+    runs-on: self-hosted
+    timeout-minutes: 10
+
+    env:
+      BASE_URL: http://localhost:3000
+      TEST_GROUPS: ${{ github.event.inputs.test_groups || 'all' }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Run all tests
+        if: ${{ env.TEST_GROUPS == 'all' }}
+        shell: powershell
+        run: mvn clean test "-Dbase.url=$env:BASE_URL" "-DtrimStackTrace=false"
+
+      - name: Run tagged tests
+        if: ${{ env.TEST_GROUPS != 'all' }}
+        shell: powershell
+        run: mvn clean test "-P$env:TEST_GROUPS" "-Dbase.url=$env:BASE_URL" "-DtrimStackTrace=false"

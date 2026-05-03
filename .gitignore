@@ -1,0 +1,28 @@
+# Maven build output
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Java artifacts
+*.class
+*.jar
+*.war
+*.ear
+
+# Test and runtime logs
+*.log
+surefire-reports/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and local config
+.env
+.env.*
+!.env.example
