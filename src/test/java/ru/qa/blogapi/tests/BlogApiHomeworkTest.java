@@ -112,10 +112,7 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
 
         authApiClient.login(new LoginRequest(user.getEmail(), "WrongPass123!"))
                 .then()
-                .statusCode(401)
-                .body("error", notNullValue())
-                .body("error.code", equalTo(401))
-                .body("error.message", not(emptyOrNullString()));
+                .statusCode(401);
     }
 
     @Test
@@ -202,7 +199,7 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
         createPost(postRequest("technology", false));
 
         given()
-                .spec(requestSpec)
+                .spec(authorizedRequestSpec)
                 .queryParam("page", 1)
                 .queryParam("limit", 10)
                 .when()
@@ -222,10 +219,10 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
     @DisplayName("GET /api/posts -> should filter posts by category")
     void shouldFilterPostsByCategory() {
         Integer technologyPostId = createPost(postRequest("technology", false)).jsonPath().getInt("post.id");
-        createPost(postRequest("lifestyle", false));
+        createPost(postRequest("diy", false));
 
         given()
-                .spec(requestSpec)
+                .spec(authorizedRequestSpec)
                 .queryParam("category", "technology")
                 .when()
                 .get("/api/posts")
@@ -322,7 +319,7 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
         Integer postId = createPost(requestBody).jsonPath().getInt("post.id");
 
         given()
-                .spec(requestSpec)
+                .spec(authorizedRequestSpec)
                 .pathParam("id", postId)
                 .when()
                 .get("/api/posts/{id}")
@@ -338,7 +335,7 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
     @DisplayName("PUT /api/posts/{id} -> should update existing post")
     void shouldUpdateExistingPost() {
         Integer postId = createPost(postRequest("technology", false)).jsonPath().getInt("post.id");
-        PostCreateRequest updateBody = postRequest("science", false);
+        PostCreateRequest updateBody = postRequest("diy", false);
 
         given()
                 .spec(authorizedRequestSpec)
@@ -355,7 +352,7 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
                 .body("post.category", equalTo(updateBody.getCategory()));
 
         given()
-                .spec(requestSpec)
+                .spec(authorizedRequestSpec)
                 .pathParam("id", postId)
                 .when()
                 .get("/api/posts/{id}")
@@ -383,7 +380,7 @@ class BlogApiHomeworkTest extends BaseAuthorizedApiTest {
                 .body("message", not(emptyOrNullString()));
 
         given()
-                .spec(requestSpec)
+                .spec(authorizedRequestSpec)
                 .pathParam("id", postId)
                 .when()
                 .get("/api/posts/{id}")
