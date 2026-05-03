@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       test_groups:
@@ -18,7 +21,7 @@ jobs:
 
     env:
       BASE_URL: http://localhost:3000
-      TEST_GROUPS: ${{ inputs.test_groups }}
+      TEST_GROUPS: ${{ github.event.inputs.test_groups || '' }}
 
     steps:
       - name: Checkout repo
